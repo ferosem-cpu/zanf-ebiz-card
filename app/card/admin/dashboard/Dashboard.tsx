@@ -378,7 +378,7 @@ function EmployeeRow({
             </p>
             <p className="text-sm text-steel">{employee.designation}</p>
             <a href={`/card/${employee.slug}`} target="_blank" rel="noopener noreferrer" className="text-xs font-mono text-blue underline">
-              zanf.in/card/{employee.slug}
+              vcard.zanf.org/card/{employee.slug}
             </a>
             <span className="ml-3 text-xs text-steel-dim">{employee.view_count} views</span>
           </div>
