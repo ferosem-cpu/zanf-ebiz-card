@@ -11,8 +11,8 @@ const clean = (v: string) => v.normalize("NFKC").replace(/[^\p{L}\p{N} .'&()-]/g
 // The Drive side is a small Google Apps Script web app owned by the company's Google account.
 // DRIVE_UPLOAD_URL and DRIVE_UPLOAD_SECRET come from the environment; nothing secret is in code.
 export async function POST(request: Request) {
-  const url = process.env.DRIVE_UPLOAD_URL;
-  const secret = process.env.DRIVE_UPLOAD_SECRET;
+  const url = process.env.DRIVE_UPLOAD_URL?.trim();
+  const secret = process.env.DRIVE_UPLOAD_SECRET?.trim();
   if (!url || !secret) {
     return NextResponse.json({ ok: false, error: "Card upload is not switched on yet. Nothing was uploaded." }, { status: 503 });
   }
