@@ -1,43 +1,51 @@
 import Image from "next/image";
 import type { Metadata } from "next";
+import QRCode from "qrcode";
+import { company } from "@/lib/company";
+import UploadCard from "./UploadCard";
 
-// The root of this app has no card to show - each card lives at /card/[slug] and the
-// admin panel at /card/admin. Show a small landing page here instead of redirecting
-// visitors away to another website. It lists no staff or card details.
 export const metadata: Metadata = {
-  title: "ZAN-F Digital Business Cards",
-  description: "Digital business cards for the team at ZAN-F Power Systems.",
+  title: "Zanf Power Systems | Digital Business Card",
+  description: "Scan the QR code or download the contact card for Zanf Power Systems.",
 };
 
-export default function Home() {
+// Read the environment on each request so the upload form appears as soon as Drive is connected.
+export const dynamic = "force-dynamic";
+
+export default async function Home() {
+  const vcfUrl = `${company.cardSiteUrl}/zanf-power-systems.vcf`;
+  const qr = await QRCode.toDataURL(vcfUrl, { width: 640, margin: 2, color: { dark: "#0e1512", light: "#ffffff" } });
+
   return (
-    <main className="mx-auto flex w-full max-w-md flex-1 flex-col justify-center px-5 py-10">
+    <main className="mx-auto flex w-full max-w-md flex-1 flex-col gap-6 px-5 py-10">
       <div className="zanf-fade-in rounded-3xl border border-[var(--line)] bg-ink-raised p-8 text-center shadow-xl shadow-black/10">
-        <div className="mx-auto h-24 w-24 overflow-hidden rounded-2xl border border-[var(--line-strong)]">
-          <Image
-            src="/zanf-logo.jpeg"
-            alt="ZAN-F Power Systems"
-            width={192}
-            height={192}
-            className="h-full w-full object-cover"
-            priority
-          />
+        <div className="mx-auto h-20 w-20 overflow-hidden rounded-2xl border border-[var(--line-strong)]">
+          <Image src="/zanf-logo.jpeg" alt={company.name} width={160} height={160} className="h-full w-full object-cover" priority />
         </div>
-        <h1 className="mt-6 font-display text-2xl font-semibold text-paper">
-          ZAN-F Digital Business Cards
-        </h1>
-        <p className="mt-3 text-steel">
-          Each member of our team has a personal digital card. Scan their QR code, or open the
-          link they shared with you, to save their contact details.
-        </p>
-        <div className="zanf-sweep my-6" />
+        <h1 className="mt-5 font-display text-2xl font-semibold text-paper">{company.name}</h1>
+        <p className="mt-2 text-steel">Scan the QR code with your phone camera to save our contact.</p>
+
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src={qr} alt={`QR code to save the ${company.name} contact`} width={256} height={256} className="mx-auto mt-5 h-64 w-64 rounded-xl border border-[var(--line-strong)]" />
+
         <a
-          href="https://zanf.org"
-          className="inline-flex items-center justify-center rounded-full bg-green px-6 py-3 font-medium text-white hover:bg-green-deep"
+          href="/zanf-power-systems.vcf"
+          download
+          className="mt-5 inline-flex items-center justify-center rounded-full bg-green px-6 py-3 font-medium text-white hover:bg-green-deep"
         >
-          Visit zanf.org
+          Download contact (.vcf)
         </a>
+
+        <div className="zanf-sweep my-6" />
+        <ul className="space-y-1 text-left text-sm text-steel">
+          <li><span className="font-medium text-paper">Phone / WhatsApp:</span> <a className="underline" href={`tel:${company.phoneE164}`}>{company.phoneDisplay}</a></li>
+          <li><span className="font-medium text-paper">Email:</span> <a className="underline" href={`mailto:${company.email}`}>{company.email}</a></li>
+          <li><span className="font-medium text-paper">Website:</span> <a className="underline" href={company.website}>zanf.org</a></li>
+          <li><span className="font-medium text-paper">Address:</span> {company.street}, {company.city} {company.postalCode}</li>
+        </ul>
       </div>
+
+      {process.env.DRIVE_UPLOAD_URL && process.env.DRIVE_UPLOAD_SECRET ? <UploadCard /> : null}
     </main>
   );
 }
